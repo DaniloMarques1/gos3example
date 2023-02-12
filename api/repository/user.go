@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"os"
 
 	"github.com/danilomarques1/gos3example/api/database"
 	"github.com/danilomarques1/gos3example/api/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -37,5 +37,9 @@ func (m *mongoUserRepository) Save(user *model.User) error {
 }
 
 func (m *mongoUserRepository) FindByEmail(email string) (*model.User, error) {
-	return nil, errors.New("To be implemented")
+	user := &model.User{}
+	if err := m.collection.FindOne(context.Background(), bson.M{"email": email}, options.FindOne()).Decode(user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }

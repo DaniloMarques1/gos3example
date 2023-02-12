@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -82,4 +83,18 @@ func (u UserController) Save(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (u UserController) FindByEmail(w http.ResponseWriter, r *http.Request) {
+	queryParams := r.URL.Query()
+	email := queryParams.Get("email") // TODO: validate
+	user, err := u.repository.FindByEmail(email)
+	if err != nil {
+		// TODO
+		log.Printf("Error fetching user %v\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	json.NewEncoder(w).Encode(user)
 }

@@ -18,15 +18,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/user", applicationJson(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
 			userController.Save(w, r)
 		case http.MethodGet:
-			// TODO
+			userController.FindByEmail(w, r)
 		}
-	})
+	}))
 
 	log.Printf("server running on port 8080\n")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func applicationJson(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		h.ServeHTTP(w, r)
+	}
 }
